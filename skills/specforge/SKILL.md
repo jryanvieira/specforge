@@ -27,6 +27,9 @@ Key fields to extract:
 - `issue_tracker.type` — linear | github-issues | jira | none
 - `execution.backend` — worktrunk | git-worktree | task-tool
 - `execution.platform` — windows | unix
+- `project.language` — language for all output (default: `pt-BR`)
+
+**Language rule:** After loading `project.yaml`, apply `project.language` to ALL output for the rest of the session — every message to the user, every generated artifact (spec, plan, STATE.md entries, PR descriptions, review comments). If `project.language` is not set, default to `pt-BR`.
 
 Always load `.specforge/STATE.md` when it exists — it holds decisions, blockers, and lessons that affect every phase.
 

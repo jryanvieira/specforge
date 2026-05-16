@@ -15,12 +15,13 @@ Set up `.specforge/` structure for a new or existing project.
 Ask the user (one question at a time if not already known):
 
 1. Project name and short description
-2. Tech stack (language, framework, database)
-3. Where should specs/plans be saved? (path, or "in-repo" for `.specs/`)
-4. Issue tracker: Linear / GitHub Issues / Jira / none?
+2. Language for generated artifacts and communication — default is `pt-BR`. Examples: `pt-BR`, `en-US`, `es-ES`, `fr-FR`, `de-DE`. From this point on, use the chosen language for all output.
+3. Tech stack (language, framework, database)
+4. Where should specs/plans be saved? (path, or "in-repo" for `.specs/`)
+5. Issue tracker: Linear / GitHub Issues / Jira / none?
    - If Linear: workspace slug?
-5. Execution backend: Worktrunk (Windows) / git worktree / Task tool?
-6. Are there existing architecture guides? (DDD patterns, layer rules, conventions?)
+6. Execution backend: Worktrunk (Windows) / git worktree / Task tool?
+7. Are there existing architecture guides? (DDD patterns, layer rules, conventions?)
 
 ### 2. Create Directory Structure
 

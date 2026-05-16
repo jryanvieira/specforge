@@ -1,6 +1,10 @@
 project:
   name: "project-name"
   description: "Short description of what this project does"
+  # Language for all generated artifacts and communication with the user.
+  # Examples: pt-BR, en-US, es-ES, fr-FR, de-DE
+  # Default: pt-BR
+  language: pt-BR
 
 artifacts:
   # Path where specs, plans, and tasks are saved.
