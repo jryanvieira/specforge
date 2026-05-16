@@ -23,10 +23,10 @@ All saved to `.specforge/architecture/`:
 ## Exploration Protocol
 
 For each document, follow the knowledge verification chain:
-1. Read the codebase directly (files, directories, configs)
-2. Read existing docs (README, inline comments)
+1. **Existing convention docs first** — CLAUDE.md, .cursorrules, .github/copilot-instructions.md, CONTRIBUTING.md, README.md. Import what's already documented.
+2. Read the codebase directly (files, directories, configs, manifests)
 3. Infer from patterns — do not fabricate
-4. Flag uncertain areas explicitly
+4. Flag uncertain areas explicitly with `[inferred]` or `[?]`
 
 Explore in passes, not all at once. Use glob and grep to navigate efficiently.
 
@@ -89,40 +89,62 @@ Explore in passes, not all at once. Use glob and grep to navigate efficiently.
 
 ## CONVENTIONS.md
 
+**Before analyzing code**, check for existing convention documentation:
+- `CLAUDE.md` (project root) — import explicit rules directly
+- `.cursorrules` / `.github/copilot-instructions.md` — editor rules
+- `CONTRIBUTING.md` / `README.md` (dev section) — contribution guidelines
+
+Import what's documented. Fill gaps with code analysis. Mark inferred items with `[inferred]`, missing with `[?]`.
+
 ```markdown
 # Conventions
 
+## Stack
+
+| Component | Technology | Version |
+|---|---|---|
+| Language | {language} | {version} |
+| Framework | {framework} | {version} |
+| Test runner | {framework} | {version} |
+| Linter / formatter | {tool} | {version} |
+
 ## Naming
 
-- Files: {snake_case / camelCase / kebab-case}
-- Types/Structs: {PascalCase}
-- Functions: {camelCase / PascalCase}
-- Error variables: {Err + PascalCase}
+- Files: {snake_case / camelCase / kebab-case / PascalCase}
+- Types/Classes: {PascalCase / etc.}
+- Functions/Methods: {camelCase / snake_case / etc.}
+- Test files: {*.test.ext / *_test.ext / test_*.ext}
+- Error types: {pattern observed}
 
 ## Error Handling
 
-{Pattern: wrapping, sentinel errors, custom types, etc.}
+{Pattern: exceptions / result types / sentinel errors / custom error classes, etc.}
 
 ## ID Generation
 
-{uuid.NewString() / cuid / etc.}
+{Library or pattern used — e.g., uuid v4, cuid2, nanoid, auto-increment}
 
 ## Timestamps
 
-{time.Now().UTC() / time.Now() / etc.}
+{Convention: UTC always / local / ISO string / Unix ms}
 
-## Money / Currency
+## Sensitive Values (money, scores, etc.)
 
-{int64 centavos / decimal / etc.}
+{Convention for precision-sensitive types — e.g., integer cents, Decimal, BigDecimal}
+
+## Test Command
+
+Full suite: `{command}`
+Single module: `{command pattern}`
 
 ## Commit Format
 
-{Conventional Commits / custom / etc.}
+{Conventional Commits / Gitmoji / custom / etc.}
 
 ## Code Patterns Observed
 
-{Patterns seen in the codebase that agents should replicate.
- Include code snippets for non-obvious patterns.}
+{Non-obvious patterns seen in the codebase that agents should replicate.
+ Include short snippets for patterns that aren't derivable from naming alone.}
 ```
 
 ---
@@ -132,28 +154,18 @@ Explore in passes, not all at once. Use glob and grep to navigate efficiently.
 ```markdown
 # Directory Structure
 
-{cmd/
-  └── server/
-      └── main.go       — entry point, composition root
-internal/
-  ├── domain/
-  │   └── {context}/    — entities, repositories (interfaces), errors
-  ├── application/
-  │   └── {context}/    — use cases
-  ├── infrastructure/
-  │   └── repositories/ — repository implementations
-  └── presentation/
-      └── http/         — handlers, routes}
+{Actual directory tree from the project — use real paths, not placeholders}
 
 ## Where to Put New Code
 
 | Type | Location |
 |---|---|
-| New entity | `internal/domain/{context}/{entity}.go` |
-| New use case | `internal/application/{context}/{usecase}.go` |
-| New repository impl | `internal/infrastructure/repositories/{db}/{context}.go` |
-| New handler | `internal/presentation/http/{context}_handler.go` |
-| New migration | `migrations/{NNN}_{description}.sql` |
+| New entity / model | `{path}` |
+| New service / use case | `{path}` |
+| New persistence impl | `{path}` |
+| New handler / controller | `{path}` |
+| New migration | `{path}` |
+| New test | `{path pattern}` |
 ```
 
 ---
@@ -167,9 +179,9 @@ internal/
 
 | Type | Location | Command |
 |---|---|---|
-| Unit (domain) | next to production files | `go test ./internal/domain/...` |
-| Integration (infra) | `internal/infrastructure/...` | `go test ./internal/infrastructure/...` |
-| End-to-end | `tests/` | `go test ./tests/...` |
+| Unit | `{path}` | `{command}` |
+| Integration | `{path}` | `{command}` |
+| End-to-end | `{path}` | `{command}` |
 
 ## Coverage
 
@@ -183,7 +195,7 @@ Single context: `{command pattern}`
 
 ## Test Patterns
 
-{How tests are structured — table-driven, subtests, helpers, mocking approach}
+{How tests are structured — table-driven, describe/it blocks, fixtures, mocking approach, assertion library}
 ```
 
 ---

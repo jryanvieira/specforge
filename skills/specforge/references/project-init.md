@@ -16,14 +16,63 @@ Ask the user (one question at a time if not already known):
 
 1. Project name and short description
 2. Language for generated artifacts and communication — default is `pt-BR`. Examples: `pt-BR`, `en-US`, `es-ES`, `fr-FR`, `de-DE`. From this point on, use the chosen language for all output.
-3. Tech stack (language, framework, database)
+3. Tech stack (language, framework, database) — skip if detectable from manifest files
 4. Where should specs/plans be saved? (path, or "in-repo" for `.specs/`)
 5. Issue tracker: Linear / GitHub Issues / Jira / none?
    - If Linear: workspace slug?
 6. Execution backend: Worktrunk (Windows) / git worktree / Task tool?
-7. Are there existing architecture guides? (DDD patterns, layer rules, conventions?)
 
-### 2. Create Directory Structure
+### 2. Convention Auto-Detection
+
+Before asking the user anything about conventions, scan the project for existing documentation. Do this in parallel — all reads are independent.
+
+**Sources to scan (check all that exist):**
+
+| File | What to extract |
+|---|---|
+| `CLAUDE.md` (project root) | Explicit coding rules, patterns, constraints |
+| `.cursorrules` | Editor conventions |
+| `.github/copilot-instructions.md` | Editor conventions |
+| `CONTRIBUTING.md` | Contribution guidelines, naming rules |
+| `README.md` | Development setup section, coding guidelines |
+
+**Stack detection from manifests (check all that exist):**
+
+| File | Signals |
+|---|---|
+| `package.json` | JS/TS stack, test runner (`jest`, `vitest`, `mocha`), lint config |
+| `go.mod` | Go version, key dependencies |
+| `requirements.txt` / `pyproject.toml` | Python stack and test framework |
+| `Gemfile` | Ruby stack |
+| `pom.xml` / `build.gradle` | Java/Kotlin stack |
+| `*.sln` / `*.csproj` | .NET stack |
+| `Cargo.toml` | Rust stack |
+
+**Code pattern sampling (read 3–5 files):**
+- One entity/model file — infer naming conventions, type patterns
+- One test file — infer test framework, assertion style, file naming
+- One handler/controller/route file — infer HTTP layer patterns
+- Entry point (`main.go`, `index.ts`, `app.py`, `server.js`, etc.) — infer wiring pattern
+
+**Generate draft `conventions.md`:**
+
+Combine all findings into a draft using the CONVENTIONS.md format from [brownfield-mapping.md](brownfield-mapping.md). Mark each item with its confidence:
+- Content found in docs → use as-is
+- Inferred from code → mark with `[inferred]`
+- Not found anywhere → mark with `[?]`
+
+**Present to the user:**
+
+Show the draft and ask:
+> "Encontrei estas convenções no projeto. Confirma, corrige ou preenche os campos `[?]`."
+
+Wait for the user to confirm or adjust before saving.
+
+Save approved content to `.specforge/architecture/conventions.md`.
+
+---
+
+### 3. Create Directory Structure
 
 ```
 .specforge/
@@ -34,11 +83,11 @@ Ask the user (one question at a time if not already known):
 └── architecture/       (empty — populated by user or brownfield mapping)
 ```
 
-### 3. Write project.yaml
+### 4. Write project.yaml
 
 Use `templates/project.yaml` as base, filling in answers from step 1.
 
-### 4. Write PROJECT.md
+### 5. Write PROJECT.md
 
 ```markdown
 # {Project Name}
@@ -71,7 +120,7 @@ Use `templates/project.yaml` as base, filling in answers from step 1.
 - {Constraint}
 ```
 
-### 5. Write ROADMAP.md
+### 6. Write ROADMAP.md
 
 ```markdown
 # Roadmap
@@ -94,19 +143,15 @@ Use `templates/project.yaml` as base, filling in answers from step 1.
 | {feature name} | {complexity} | {why deferred} |
 ```
 
-### 6. Write STATE.md
+### 7. Write STATE.md
 
 Use `templates/state-template.md` — creates an empty STATE.md with all sections initialized.
 
-### 7. Architecture Guides (for existing codebases)
+### 8. Full Architecture Mapping (existing codebases only)
 
-If the project has established patterns that agents must follow:
+If `conventions.md` from step 2 revealed a complex codebase with multiple layers and patterns, run [brownfield-mapping.md](brownfield-mapping.md) to generate the remaining 6 architecture documents (STACK, ARCHITECTURE, STRUCTURE, TESTING, INTEGRATIONS, CONCERNS).
 
-**Option A — Manual:** Have the user describe or paste existing architecture guides. Save to `.specforge/architecture/`.
-
-**Option B — Brownfield mapping:** Run [brownfield-mapping.md](brownfield-mapping.md) to generate architecture docs from the existing codebase automatically.
-
-For new projects: create `.specforge/architecture/conventions.md` with project conventions as they are established.
+For new projects: `conventions.md` from step 2 is sufficient. The remaining documents grow organically as the codebase is built.
 
 ## After Init
 
