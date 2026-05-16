@@ -1,0 +1,8 @@
+{
+  "name": "specforge",
+  "description": "Spec-driven development framework with parallel execution, pluggable issue trackers, and a learning loop. Covers the full lifecycle: product discovery → spec → design → plan → execute → PR → review.",
+  "author": {
+    "name": "João Araujo",
+    "email": "jryanvieira10@gmail.com"
+  }
+}

@@ -1,0 +1,27 @@
+project:
+  name: "project-name"
+  description: "Short description of what this project does"
+
+artifacts:
+  # Path where specs, plans, and tasks are saved.
+  # Use an absolute path for external storage (e.g., Obsidian/SecondBrain),
+  # or ".specs" for in-repo storage.
+  path: "C:/Users/yourname/path/to/SecondBrain/Projetos/project-name"
+
+issue_tracker:
+  # Options: linear | github-issues | jira | none
+  type: linear
+  # For Linear: the workspace slug (from your Linear URL)
+  workspace: "your-workspace-slug"
+  # For GitHub Issues: owner/repo
+  # repo: "owner/repo-name"
+
+execution:
+  # Options: worktrunk | git-worktree | task-tool
+  backend: worktrunk
+  # Options: windows | unix
+  platform: windows
+
+# Optional: custom branch prefix for task branches
+# Default pattern: task/{ISSUE-ID}-{description}
+# branch_prefix: "task"
