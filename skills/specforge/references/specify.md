@@ -39,7 +39,7 @@ Cover these topics — in the order that makes sense for this feature:
 6. What are the testable acceptance criteria?
 7. Are there security, performance, or compliance constraints?
 
-Deepen each answer before moving on. Only advance when you have enough clarity to write Go contracts (or equivalent for the project stack).
+Deepen each answer before moving on. Only advance when you have enough clarity to write precise contracts (types, interfaces, error cases) in the project's language.
 
 **Gray area detection:** If during the interview you identify ambiguous UX behavior, conflicting requirements, or decisions that depend on user preference — do NOT resolve them yourself. Instead, trigger [discuss.md](discuss.md) to capture those decisions before proceeding.
 
@@ -105,31 +105,27 @@ List each affected context and describe the change scope:
 | {ContextName} | {what changes} | Addition / Modification / Read-only |
 ```
 
-### Interfaces & Contracts (for backend features)
+### Interfaces & Contracts
 
-List the Go interfaces, types, and domain errors that must exist after implementation. Be precise — subagents will implement against these contracts.
+Describe the types, interfaces/protocols, and error cases that must exist after implementation. Use the notation that matches the project's language — check `.specforge/architecture/conventions` for the convention. Be precise — subagents will implement against these contracts.
 
 ```markdown
 ## Interfaces & Contracts
 
 ### {ContextName}
 
-```go
-type {Entity} struct {
-    ID        string
-    // ...
-}
+```
+Entity: {Entity}
+  - id: string
+  - {field}: {type}
 
-type {Repository} interface {
-    Create(ctx context.Context, e *{Entity}) error
-    FindByID(ctx context.Context, id string) (*{Entity}, error)
-}
+Repository/Store: {Entity}Repository
+  - create(entity: {Entity}) → Result | Error
+  - findById(id: string) → {Entity} | null | Error
 
-// Domain errors
-var (
-    Err{Entity}NotFound = errors.New("{entity} not found")
-    Err{Entity}Invalid  = errors.New("{entity} invalid")
-)
+Errors:
+  - {Entity}NotFound
+  - {Entity}Invalid
 ```
 ```
 
@@ -167,8 +163,8 @@ Before marking the spec as Approved, verify:
 - [ ] Every requirement has a unique ID and priority level
 - [ ] Every acceptance criterion is testable (Given/When/Then format)
 - [ ] All affected bounded contexts are identified
-- [ ] Interfaces/contracts are typed correctly (centavos not floats, pointers for optionals)
-- [ ] Domain errors are listed per context
+- [ ] Interfaces/contracts reflect the project's type conventions (from `.specforge/architecture/conventions`)
+- [ ] Error/exception cases are listed per context
 - [ ] Out of scope section prevents ambiguity during PLAN
 - [ ] No architectural decisions violate `.specforge/architecture/` guides
 - [ ] Deferred ideas are captured, not dropped

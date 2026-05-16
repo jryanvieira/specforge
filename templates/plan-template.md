@@ -38,42 +38,34 @@ Parallel groups:
  invariants to respect. Self-contained — no references to other tasks.}
 
 **Files to create/modify:**
-- `internal/domain/{context}/{entity}.go` — create entity with New and Reconstruct constructors
-- `internal/domain/{context}/{entity}_test.go` — unit tests for validation
-- `internal/domain/{context}/errors.go` — domain error types
+- `{domain-layer}/{context}/{entity}.{ext}` — {what to do: create entity, add method}
+- `{domain-layer}/{context}/{entity}_test.{ext}` — {what to test}
+- `{domain-layer}/{context}/errors.{ext}` — {error/exception types for this context}
 
-**Expected interfaces at completion:**
-```go
-type {Entity} struct {
-    ID        string
-    UserID    string
-    Amount    int64     // centavos
-    CreatedAt time.Time
-}
+**Expected contracts at completion:**
+```
+Entity: {Entity}
+  - id: string
+  - createdAt: datetime
 
-func New{Entity}(userID string, amount int64) (*{Entity}, error)
-func Reconstruct{Entity}(id, userID string, amount int64, createdAt time.Time) *{Entity}
+Constructor: new{Entity}(params) → {Entity} | Error
+Validates: {invariant 1}, {invariant 2}
 
-var (
-    Err{Entity}Invalid  = errors.New("{entity}: invalid")
-    Err{Entity}NotFound = errors.New("{entity}: not found")
-)
+Errors: {Entity}Invalid, {Entity}NotFound
 ```
 
 **Tests that must pass:**
-- `go test ./internal/domain/{context}/...`
-- Given valid input, New{Entity} returns entity without error
-- Given zero amount, New{Entity} returns Err{Entity}Invalid
-- Given negative amount, New{Entity} returns Err{Entity}Invalid
+- {test-command from project conventions} — {scenario description}
+- Given valid input, new{Entity} returns entity without error
+- Given invalid {field}, new{Entity} returns {Entity}Invalid error
 
 **Gate:**
 ```
-cd backend && go test ./internal/domain/{context}/...
+{test-command from .specforge/architecture/conventions — e.g., npm test, pytest, go test ./...}
 ```
 
 **Done when:**
-{Entity} struct exists with New and Reconstruct constructors. New validates all fields.
-Domain error types are defined. All unit tests pass.
+{Entity} type exists with constructor that validates all required fields. Error types defined. All unit tests pass.
 
 ---
 
@@ -89,33 +81,30 @@ Domain error types are defined. All unit tests pass.
 {Context for this task...}
 
 **Files to create/modify:**
-- `internal/domain/{context}/repository.go` — repository interface
-- `internal/infrastructure/repositories/sqlite/{context}.go` — SQLite implementation
-- `internal/infrastructure/repositories/sqlite/{context}_test.go` — integration tests
+- `{domain-layer}/{context}/repository.{ext}` — repository interface/protocol
+- `{data-layer}/{context}.{ext}` — persistence implementation
+- `{data-layer}/{context}_test.{ext}` — integration tests
 
-**Expected interfaces at completion:**
-```go
-type {Entity}Repository interface {
-    Create(ctx context.Context, e *{Entity}) error
-    FindByID(ctx context.Context, id string) (*{Entity}, error)
-    ListByUser(ctx context.Context, userID string) ([]*{Entity}, error)
-}
+**Expected contracts at completion:**
+```
+Interface: {Entity}Repository
+  - create(entity: {Entity}) → Result | Error
+  - findById(id: string) → {Entity} | null | Error
+  - listByUser(userId: string) → [{Entity}] | Error
 ```
 
 **Tests that must pass:**
-- `go test ./internal/infrastructure/repositories/sqlite/...`
-- Create persists entity and can be retrieved by FindByID
-- FindByID returns Err{Entity}NotFound for unknown ID
-- ListByUser returns only entities belonging to the given user
+- {test-command} — create persists entity and can be retrieved by findById
+- findById returns {Entity}NotFound for unknown id
+- listByUser returns only entities belonging to the given user
 
 **Gate:**
 ```
-cd backend && go test ./internal/infrastructure/repositories/sqlite/...
+{test-command for data layer}
 ```
 
 **Done when:**
-{Entity}Repository interface defined in domain. SQLite implementation complete.
-All integration tests pass against a real (in-memory) SQLite database.
+{Entity}Repository interface/protocol defined. Persistence implementation complete. All integration tests pass against a real database.
 
 ---
 
@@ -131,43 +120,30 @@ All integration tests pass against a real (in-memory) SQLite database.
 {Context for this task...}
 
 **Files to create/modify:**
-- `internal/application/{context}/create_{entity}.go` — use case
-- `internal/application/{context}/create_{entity}_test.go` — use case tests
+- `{application-layer}/{context}/create_{entity}.{ext}` — use case / service
+- `{application-layer}/{context}/create_{entity}_test.{ext}` — use case tests
 
-**Expected interfaces at completion:**
-```go
-type Create{Entity}Request struct {
-    UserID string
-    Amount int64
-}
+**Expected contracts at completion:**
+```
+UseCase/Service: Create{Entity}
+  Input:  { userId: string, {other fields} }
+  Output: { id: string, {other fields} } | Error
 
-type Create{Entity}Response struct {
-    ID        string
-    Amount    int64
-    CreatedAt time.Time
-}
-
-type Create{Entity}UseCase struct {
-    repo domain.{Entity}Repository
-}
-
-func (uc *Create{Entity}UseCase) Execute(ctx context.Context, req Create{Entity}Request) (*Create{Entity}Response, error)
+Orchestrates: validates input → calls repository → returns result
 ```
 
 **Tests that must pass:**
-- `go test ./internal/application/{context}/...`
-- Execute with valid request creates entity and returns response
-- Execute with invalid amount returns domain error
-- Execute propagates repository errors
+- {test-command} — execute with valid input creates entity and returns response
+- execute with invalid {field} returns domain error
+- execute propagates repository errors
 
 **Gate:**
 ```
-cd backend && go test ./internal/application/{context}/...
+{test-command for application layer}
 ```
 
 **Done when:**
-Create{Entity}UseCase implemented with Execute method. Tests use a mock/stub repository.
-All use case tests pass.
+Create{Entity} use case/service implemented. Tests use a stub/mock repository. All tests pass.
 
 ---
 
@@ -183,31 +159,30 @@ All use case tests pass.
 {Context for this task...}
 
 **Files to create/modify:**
-- `internal/presentation/http/{context}_handler.go` — HTTP handler
-- `internal/presentation/http/{context}_handler_test.go` — handler tests
-- `cmd/server/main.go` — wire use case and handler
+- `{presentation-layer}/{context}_handler.{ext}` — HTTP handler / controller / route
+- `{presentation-layer}/{context}_handler_test.{ext}` — handler tests
+- `{entry-point}` — wire use case and handler
 
-**Expected interfaces at completion:**
+**Expected contracts at completion:**
 ```
 POST /api/v1/{resource}
 Authorization: Bearer {token}
-Body: { "amount": 1000 }
-Response 201: { "id": "...", "amount": 1000, "created_at": "..." }
-Response 400: { "error": "{entity}: invalid" }
-Response 401: (missing/invalid token)
+Body: { {fields} }
+
+201: { "id": "...", {fields} }
+400: { "error": "{entity}: invalid" }
+401: (missing/invalid token)
 ```
 
 **Tests that must pass:**
-- `go test ./internal/presentation/http/...`
-- POST with valid body returns 201 with created entity
+- {test-command} — POST with valid body returns 201 with created entity
 - POST with invalid body returns 400
 - POST without auth returns 401
 
 **Gate:**
 ```
-cd backend && go test ./...
+{full test-command — runs all tests}
 ```
 
 **Done when:**
-HTTP handler registered on router. End-to-end: POST creates entity and returns 201.
-All tests pass including handler tests.
+Handler registered on router. End-to-end: POST creates entity and returns 201. All tests pass.

@@ -1,6 +1,6 @@
 ---
 name: specforge
-description: Spec-driven development framework. Full lifecycle from product discovery to review. Auto-sizes by complexity. Parallel execution via Worktrunk. Pluggable issue trackers (Linear default). SecondBrain or in-repo artifact storage. Use for: starting features, implementing from issues, quick fixes, mapping codebases, reviewing PRs, pausing/resuming work. Triggers on "discover features", "specify", "technical design", "tdd", "design", "plan tasks", "implement", "execute", "open PR", "review PR", "quick fix", "pause work", "resume work", "map codebase", "init project".
+description: Spec-driven development framework. Full lifecycle from product discovery to review. Auto-sizes by complexity. Parallel execution via Worktrunk. Pluggable issue trackers (Linear default). SecondBrain or in-repo artifact storage. Use for: starting features, implementing from issues, quick fixes, mapping codebases, reviewing PRs, pausing/resuming work. Triggers on "discover features", "specify", "design", "plan tasks", "implement", "execute", "open PR", "review PR", "quick fix", "pause work", "resume work", "map codebase", "init project".
 ---
 
 # SpecForge
@@ -8,10 +8,10 @@ description: Spec-driven development framework. Full lifecycle from product disc
 Spec-driven development framework. Plan with precision. Execute in parallel. Learn continuously.
 
 ```
-┌──────────┐  ┌─────────┐  ┌─────┐  ┌────────┐  ┌─────────┐  ┌────┐  ┌────┐
-│ DISCOVER │→ │ SPECIFY │→ │ TDD │→ │ DESIGN │→ │  PLAN   │→ │ EX │→ │ PR │→ REVIEW
-└──────────┘  └─────────┘  └─────┘  └────────┘  └─────────┘  └────┘  └────┘
-   optional      always    optional   optional     optional    always  always*
+┌──────────┐  ┌─────────┐  ┌────────┐  ┌─────────┐  ┌────┐  ┌────────┐
+│ DISCOVER │→ │ SPECIFY │→ │ DESIGN │→ │  PLAN   │→ │ EX │→ │   PR   │→ REVIEW
+└──────────┘  └─────────┘  └────────┘  └─────────┘  └────┘  └────────┘
+   optional      always     optional     optional    always   always*
 
 * PR + REVIEW skipped in quick mode
 ```
@@ -41,10 +41,8 @@ Always load `.specforge/STATE.md` when it exists — it holds decisions, blocker
 |---|---|---|
 | **Quick** | ≤3 files, one-sentence change, no design decisions | [quick-mode](references/quick-mode.md) only |
 | **Simple** | Single feature, clear scope, <5 obvious steps | SPECIFY → EXECUTE → PR |
-| **Medium** | Multi-file, clear architecture, 5-10 tasks | SPECIFY → [TDD] → PLAN → EXECUTE → PR → REVIEW |
-| **Complex** | Multi-context, ambiguous requirements, new patterns | DISCOVER → SPECIFY → discuss → [TDD] → DESIGN → PLAN → EXECUTE → PR → REVIEW |
-
-**When to add TDD:** payments/auth/PII features, cross-team sign-off required, production systems with rollback plans, schema migrations. See [tdd.md](references/tdd.md) for full criteria.
+| **Medium** | Multi-file, clear architecture, 5-10 tasks | SPECIFY → PLAN → EXECUTE → PR → REVIEW |
+| **Complex** | Multi-context, ambiguous requirements, new patterns | DISCOVER → SPECIFY → discuss → DESIGN → PLAN → EXECUTE → PR → REVIEW |
 
 **Safety valve:** Even when PLAN is skipped, EXECUTE must list atomic steps inline before starting. If that listing reveals >5 steps or complex dependencies, STOP and run [plan.md](references/plan.md) first.
 
@@ -62,13 +60,6 @@ Reference: [specify.md](references/specify.md)
 Transforms a feature request or issue into a spec with traceable requirement IDs. Conducts a structured interview for complex features; generates directly for simple ones. Output includes problem statement, requirements (FEAT-NNN), acceptance criteria, bounded contexts, out of scope, risks.
 
 Gray areas detected during SPECIFY trigger [discuss.md](references/discuss.md), which captures user decisions in `context.md` before proceeding.
-
-### TDD — Technical Design Document (optional)
-Reference: [tdd.md](references/tdd.md)
-
-Produces a stakeholder-aligned technical design document before implementation begins. Required when sign-off is needed from product, security, or compliance; or when the feature involves payments, authentication, PII, schema migrations, or production rollback plans. Skipped for Quick and Simple features.
-
-Adapts to project size (Small/Medium/Large) with mandatory and optional sections. After stakeholder approval, architectural decisions are copied to `.specforge/STATE.md`.
 
 ### DESIGN (optional — Large/Complex only)
 Reference: [design.md](references/design.md)

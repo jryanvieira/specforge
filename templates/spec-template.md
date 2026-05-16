@@ -44,26 +44,24 @@
 
 ## Interfaces & Contracts
 
+Describe the types, interfaces, and error cases that must exist after implementation.
+Use the notation that matches the project's language (from `.specforge/architecture/conventions`).
+
 ### {ContextName}
 
-```go
-type {Entity} struct {
-    ID        string
-    CreatedAt time.Time
-    // ...
-}
+```
+Entity: {Entity}
+  - id: string
+  - createdAt: datetime
+  - {field}: {type}
 
-type {Repository} interface {
-    Create(ctx context.Context, e *{Entity}) error
-    FindByID(ctx context.Context, id string) (*{Entity}, error)
-    ListByUser(ctx context.Context, userID string) ([]*{Entity}, error)
-}
+Repository/Store: {Entity}Repository
+  - create(entity: {Entity}) → Result | Error
+  - findById(id: string) → {Entity} | null | Error
 
-// Domain errors
-var (
-    Err{Entity}NotFound = errors.New("{entity}: not found")
-    Err{Entity}Invalid  = errors.New("{entity}: invalid")
-)
+Errors:
+  - {Entity}NotFound — raised when entity does not exist
+  - {Entity}Invalid  — raised when invariant is violated
 ```
 
 ---

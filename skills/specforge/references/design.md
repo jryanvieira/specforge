@@ -49,7 +49,7 @@ High-level diagram (mermaid) showing the components and their relationships.
 graph TD
     A[Component A] -->|uses| B[Component B]
     B -->|calls| C[Repository Interface]
-    C -->|implemented by| D[SQLite Repository]
+    C -->|implemented by| D[Persistence Implementation]
 ```
 
 ### Components
@@ -63,12 +63,12 @@ For each new or significantly changed component:
 **Bounded Context:** {context}
 **Responsibility:** {single, clear responsibility}
 
-**Interface:**
-```go
-type {ComponentName} interface {
-    // ...
-}
+**Interface/Protocol:**
 ```
+{ComponentName}:
+  - method(param: type) → result | error
+```
+Use the notation from the project's language (`.specforge/architecture/conventions`).
 
 **Reuses:** {existing component it builds on, or "none"}
 **Why new vs reuse:** {justification if not reusing}
@@ -128,8 +128,8 @@ Design-level risks not captured in the spec:
 - [ ] All new components are justified (no premature abstraction)
 - [ ] Existing patterns are reused where possible
 - [ ] Every interface aligns with `.specforge/architecture/` guides
-- [ ] No domain layer imports infrastructure
-- [ ] Error types are defined per bounded context
+- [ ] Layer dependency direction is respected (domain does not depend on infrastructure)
+- [ ] Error/exception types are defined per bounded context
 - [ ] Data flow covers error paths, not just happy path
 - [ ] AD entries are written for non-obvious decisions
 - [ ] Migration plan exists if schema or API changes are needed

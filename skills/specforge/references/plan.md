@@ -50,26 +50,28 @@ Each task follows this exact format:
  Do NOT reference other tasks — the subagent only sees this task.}
 
 **Files to create/modify:**
-- `{path/to/file.go}` — {what to do: create Use Case, add method, implement interface}
-- `{path/to/file_test.go}` — {what to test}
+- `{path/to/file.{ext}}` — {what to do: create entity, add method, implement interface}
+- `{path/to/test_file.{ext}}` — {what to test}
 
-**Expected interfaces at completion:**
-{Exact Go code (or equivalent) that must exist when done.
+Use the file naming and directory conventions from `.specforge/architecture/conventions`.
+
+**Expected contracts at completion:**
+{Exact interface/contract — in the project's language or pseudocode — that must exist when done.
  Copied or derived from spec.md interfaces section.}
 
 **Tests that must pass:**
-- `{go test ./internal/domain/xxx/...}` — {scenario description}
+- `{test-command}` — {scenario description}
 - Scenario: Given {context}, when {action}, then {outcome}
 - Scenario: Given {edge case}, when {action}, then {error type}
 
 **Gate:**
 ```
-cd {backend-dir} && go test ./...
+{test-command from .specforge/architecture/conventions}
 ```
 All tests pass. Build succeeds. No linter errors.
 
 **Done when:**
-{Objective, binary description. "The CreateGoal use case exists, accepts a GoalRequest, validates all fields, persists via GoalRepository, and returns ErrGoalInvalid for amounts ≤ 0."}
+{Objective, binary description. "The Create{Entity} use case exists, accepts {EntityRequest}, validates all required fields, persists via {Entity}Repository, and returns {Entity}Invalid for invalid inputs."}
 ```
 
 ## Dependency Graph
@@ -98,9 +100,7 @@ Parallel groups:
 
 - Tasks are parallel if they touch different files
 - Tasks that both write to the same file must be sequential
-- Domain layer tasks always come before application layer tasks
-- Application layer tasks come before infrastructure tasks
-- Infrastructure tasks come before presentation tasks
+- Follow the dependency order defined in `.specforge/architecture/` (e.g., domain before application, data layer before presentation)
 
 ## Output
 

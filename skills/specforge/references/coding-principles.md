@@ -70,20 +70,20 @@ Types: `feat`, `fix`, `refactor`, `test`, `chore`, `docs`
 
 Examples:
 ```
-feat(goal): add CreateGoal use case with minimum amount validation
-fix(expense): handle nil category in JSON response mapping
-refactor(auth): extract token claims to typed struct
+feat(payments): add CreatePayment use case with amount validation
+fix(api): handle missing field in JSON response mapping
+refactor(auth): extract token claims to dedicated type
 ```
 
 Do NOT use `git add -A` blindly. Stage only the files your task touched.
 
 ## Error Handling
 
-- Every error must be handled — no silent swallows (`_ = err`)
-- Return errors upward, don't log-and-continue in business logic
-- Domain errors are typed sentinel values, not fmt.Errorf strings
-- HTTP handlers translate domain errors to status codes (not the other way around)
-- Never return internal error details (stack traces, SQL errors) to the HTTP client
+- Every error must be handled — no silent swallows
+- Return errors upward; don't log-and-continue in business logic
+- Domain errors are typed named values, not generic strings — follow the pattern in `.specforge/architecture/conventions`
+- Presentation layer (HTTP handlers, controllers) translates domain errors to response codes — business logic does not know about HTTP
+- Never return internal error details (stack traces, query errors) to external clients
 
 ## Security Defaults
 
